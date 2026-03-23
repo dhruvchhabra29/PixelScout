@@ -15,8 +15,6 @@ It demonstrates:
 ## Public API Used
 
 **API**: Unsplash JSON API – Search Photos endpoint  
-**Docs**: https://unsplash.com/documentation [Search Photos section]  
-**Guidelines**: https://help.unsplash.com/en/collections/1451694-api-guidelines
 
 Key details:
 

@@ -1,6 +1,6 @@
-# PixelScout – Image Search Gallery
+# PixelScout – Recipe Finder
 
-PixelScout is a responsive web application that lets users search and explore high‑quality photos using the Unsplash API with JavaScript and the `fetch` API. The focus of the project is on clean UI, client‑side searching, filtering, and sorting with array higher‑order functions.
+PixelScout is a responsive web application that lets users search and explore recipes from around the world using **TheMealDB** public API. The app is built with vanilla JavaScript and the `fetch` API, and focuses on clean UI plus client‑side searching, filtering, and sorting using array higher‑order functions.
 
 ---
 
@@ -10,56 +10,57 @@ This project is built as part of a JavaScript API & UI assignment.
 
 It demonstrates:
 
-- Integration with a public REST API (Unsplash Image API)
+- Integration with a public REST API (TheMealDB Recipe API)
 - Dynamic data fetching with `fetch` and JSON handling
 - Search, filtering, and sorting implemented using array higher‑order functions
-- Responsive, accessible UI built with modern CSS
+- Responsive, user‑friendly UI created with modern CSS
 - Basic error handling and loading states for API calls
 
 ---
 
 ## 🌐 Public API Used
 
-**API**: Unsplash JSON API – Search Photos endpoint  
-**Docs**: https://unsplash.com/documentation [web:16]  
-**Developer Portal**: https://unsplash.com/developers [web:17]  
+**API**: TheMealDB – Free Recipe API  
+**Base URL**: `https://www.themealdb.com/api/json/v1/1`  
+**Docs**: https://www.themealdb.com/api.php [web:51][web:59]
 
-Key details:
+Key endpoints used in this project:
 
-- **Endpoint**:  
-  `GET https://api.unsplash.com/search/photos`
-- **Important query parameters**:  
-  - `query` – keyword to search photos  
-  - `page` – page number for pagination  
-  - `per_page` – number of results per page  
-  - `order_by` – sort order (`relevant`, `latest`) [web:16][web:20]
-  - `orientation` – filter by photo orientation (landscape, portrait, squarish)  
-  - `color` – filter by dominant color (e.g., `black_and_white`, `blue`, `green`) [web:20]
+- **Search meals by name**
 
-**Authentication**
+  ```text
+  GET https://www.themealdb.com/api/json/v1/1/search.php?s={query}
+  ```
 
-Requests to the Unsplash API require an access key:
+  Returns meals whose name matches the search query (e.g., `chicken`, `pasta`). [web:51][web:42]
 
-```http
-Authorization: Client-ID YOUR_ACCESS_KEY
-```
+- **List categories**
 
-In this project, the access key is kept outside of the public repository (for example in a separate config file or environment variable) so that it is not exposed in version control. [web:16][web:17]
+  ```text
+  GET https://www.themealdb.com/api/json/v1/1/list.php?c=list
+  ```
 
-**API Guidelines & Attribution**
+  Provides all available meal categories (e.g., Beef, Chicken, Dessert). [web:51]
 
-This project follows Unsplash’s API guidelines:
+- **List areas (cuisines)**
 
-- Uses the hotlinked image URLs from the `photo.urls` properties. [web:18][web:67]
-- Displays proper attribution for each photo: photographer name and link back to their Unsplash profile. [web:34]
-- Uses `utm_source=pixelscout&utm_medium=referral` in links back to Unsplash where applicable. [web:34]
+  ```text
+  GET https://www.themealdb.com/api/json/v1/1/list.php?a=list
+  ```
 
-For more information, see:
+  Provides all areas/cuisines (e.g., Italian, Indian, Mexican). [web:51]
 
-- API Guidelines: https://help.unsplash.com/en/articles/2511245-unsplash-api-guidelines [web:18]
-- Attribution: https://help.unsplash.com/en/articles/2511315-guideline-attribution [web:34]
-- Hotlinking Images: https://help.unsplash.com/en/articles/2511271-guideline-hotlinking-images [web:67]
-- API Terms: https://unsplash.com/api-terms [web:21]
+- **Lookup full meal details by ID**
+
+  ```text
+  GET https://www.themealdb.com/api/json/v1/1/lookup.php?i={idMeal}
+  ```
+
+  Returns complete instructions, ingredients, and extra details for a single recipe. [web:51][web:45]
+
+The API returns JSON with a `meals` array, where each meal includes fields such as `idMeal`, `strMeal`, `strCategory`, `strArea`, `strInstructions`, and `strMealThumb` (image URL). [web:45]
+
+The free test key is built into the URL (`/api/json/v1/1/`), so **no extra authentication or secret key is required**, and the endpoints can safely be used directly in the code. [web:51][web:63]
 
 ---
 
@@ -67,61 +68,65 @@ For more information, see:
 
 ### Milestone 1 – Planning & Setup (current)
 
-- Decide project idea: **image search gallery (PixelScout)**
-- Choose public API: **Unsplash Search Photos endpoint**
+- Decide project idea: **Recipe Finder (PixelScout)**
+- Choose public API: **TheMealDB free recipe API**
 - Create GitHub repository and initial project structure
 - Add this `README.md` describing:
   - Project purpose
-  - API details
+  - API being used
   - Planned features
   - Technologies and setup
 
 ### Milestone 2 – API Integration
 
-- Implement `fetch` requests to the Unsplash Search Photos endpoint
-- Display search results as image cards in a responsive grid layout
+- Use `fetch` to call TheMealDB search endpoint (`search.php?s=`) to search recipes by name
+- Display search results as recipe cards in a responsive grid
 - Show loading state while fetching data
-- Handle basic API errors (network issues, rate limit, empty results)
-- Ensure layout works well on mobile, tablet, and desktop screens
+- Handle API errors (network issues or no results)
+- Ensure layout is responsive on mobile, tablet, and desktop
 
 ### Milestone 3 – Core Interactivity (Array HOFs)
 
-Implement at least three of the following features using array higher‑order functions (HOFs) like `map`, `filter`, `sort`, and `find` (no `for`/`while` loops):
+Implement at least three of the following features using array higher‑order functions such as `map`, `filter`, `sort`, and `find` (no `for`/`while` loops):
 
 - **Search**:
-  - Search photos by keyword and update the gallery dynamically
+  - Search recipes by name (e.g., “pasta”, “chicken”) and update the gallery dynamically
+
 - **Filtering** (`filter`):
-  - Filter by orientation (landscape, portrait, squarish)
-  - Filter by color (e.g., black_and_white, blue, green)
+  - Filter recipes by **category** (e.g., Beef, Chicken, Dessert)
+  - Filter recipes by **area/cuisine** (e.g., Italian, Indian, Mexican)
+
 - **Sorting** (`sort`):
-  - Sort by likes (ascending/descending)
-  - Sort by date (latest vs. older) using available metadata
+  - Sort recipes alphabetically by name (A–Z / Z–A)
+  - Sort recipes by area (group cuisines together, A–Z / Z–A)
+
 - **Button Interactions**:
-  - “View more” button to open full photo or Unsplash details page
-  - “Favorite” button to save selected images to a favorites list (using `localStorage`)
+  - “View Recipe” button to open the full recipe page on TheMealDB
+  - Later enhancement: “Favorite” button to save recipes to a favorites list (using `localStorage`)
+
 - **Dark / Light Mode**:
-  - Theme toggle button
+  - Theme toggle button to switch between dark and light themes
   - Persist user preference in `localStorage`
 
 All search, filter, and sort logic will be implemented using array higher‑order functions instead of traditional loops.
 
 ### Milestone 4 – Documentation & Deployment
 
-- Refactor and clean up JavaScript and CSS for readability
-- Organize code into smaller, reusable modules/functions
+- Refactor and clean up JavaScript and CSS
+- Break logic into smaller, reusable functions/modules
 - Add final screenshots and detailed usage instructions to the README
 - Deploy the app (Netlify, Vercel, or GitHub Pages)
-- Verify responsiveness and fix any remaining UI issues
+- Verify responsiveness and fix any remaining UI or UX issues
 
 ---
 
 ## 🛠️ Technologies
 
 - **HTML5** – structure and markup
-- **CSS3** (optionally Tailwind CSS or Bootstrap) – styling and layout
+- **CSS3** (optionally Tailwind CSS / Bootstrap) – styling and layout
 - **Vanilla JavaScript (ES6+)** – application logic and interactivity
-- **Fetch API** – network requests to Unsplash
-- **Git & GitHub** – version control and hosting
+- **Fetch API** – HTTP requests to TheMealDB
+- **Git & GitHub** – version control and repository hosting
 - **Netlify / Vercel / GitHub Pages** – planned deployment platforms
 
 ---
@@ -135,19 +140,19 @@ PixelScout/
   │   └─ style.css
   ├─ src/
   │   ├─ app.js        // main application logic and UI rendering
-  │   └─ api.js        // Unsplash API configuration & helper functions
+  │   └─ api.js        // TheMealDB API helper functions
   ├─ assets/
-  │   └─ icons/        // icons for theme toggle, loader, etc.
+  │   └─ icons/        // icons, loaders, etc. (optional)
   └─ README.md
 ```
 
-This structure separates API logic, UI logic, styles, and static assets for better maintainability.
+This structure separates API logic, UI rendering, styles, and assets to keep the codebase clean and maintainable.
 
 ---
 
 ## 🚀 Project Setup & Run Instructions
 
-> Note: For Milestone 1, a basic setup and this README are sufficient. The steps below describe how to run the project locally once API integration is implemented.
+> For Milestone 1, it is enough to have the repository, basic structure, and this README. The steps below describe how to run the project locally once implementation begins.
 
 1. **Clone the repository**
 
@@ -156,43 +161,32 @@ This structure separates API logic, UI logic, styles, and static assets for bett
    cd PixelScout
    ```
 
-2. **Configure Unsplash access key**
+2. **Open the app**
 
-   - Create a small config file (for example `src/config.js`) that exports your Unsplash access key.
-   - Add this file to `.gitignore` to avoid committing secrets.
-   - Example:
+   - Open `index.html` directly in your browser, or  
+   - Use a simple local server (for example, the Live Server extension in VS Code).
 
-   ```js
-   export const UNSPLASH_ACCESS_KEY = "your_access_key_here";
-   ```
+3. **Use PixelScout (after integration)**
 
-   - In `api.js`, import and use this key instead of hard‑coding it.
+   - Enter a recipe name into the search bar (e.g., “chicken”, “pasta”).
+   - Use category and area (cuisine) dropdowns to filter results.
+   - Use sort options to order recipes by name or area.
+   - Click “View Recipe” on a card to open the full recipe on TheMealDB site.
 
-3. **Open the app**
-
-   - Open `index.html` directly in your browser, or
-   - Use a simple local development server (e.g., Live Server extension in VS Code).
-
-4. **Use PixelScout**
-
-   - Enter a keyword in the search bar to fetch photos.
-   - Use filter and sort controls (once implemented) to refine the results.
-   - Click “View” or similar buttons to see the photo on Unsplash.
-
-Detailed setup and usage instructions will be updated after API integration (Milestone 2) and interactivity (Milestone 3) are complete.
+More detailed setup and usage instructions will be added after Milestone 2 and Milestone 3 are completed.
 
 ---
 
 ## 📌 Project Status
 
 - Milestone 1: **Planning & setup**
-- Milestone 2: **Pending** – API integration and basic gallery view
-- Milestone 3: **Pending** – search, filter, sort, favorites, and theme toggle
-- Milestone 4: **Pending** – refactor, documentation, and deployment
+- Milestone 2: **Pending** – API integration and basic recipe gallery
+- Milestone 3: **Pending** – search, filter, sort, and interactive features
+- Milestone 4: **Pending** – refactoring, documentation, and deployment
 
 ---
 
 ## 📄 License
 
 This project is for educational purposes.  
-Photos and media are provided by **Unsplash** and are subject to Unsplash’s license and API terms. [web:21][web:34]
+Recipe data and images are provided by **TheMealDB** and are subject to their own terms of use. [web:51][web:59][web:63]

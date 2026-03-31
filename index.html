@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>PixelScout – Recipe Finder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles/style.css" />
+  </head>
+  <body>
+    <header class="header">
+      <h1 class="logo">PixelScout</h1>
+      <form id="search-form" class="search-form">
+        <input
+          type="text"
+          id="search-input"
+          class="search-input"
+          placeholder="Search recipes (e.g., pasta, chicken)..."
+          autocomplete="off"
+          required
+        />
+        <button type="submit" class="btn btn-primary">Search</button>
+      </form>
+    </header>
+
+    <main class="main">
+      <section class="controls">
+        <div class="control-group">
+          <label for="category-select">Category</label>
+          <select id="category-select" class="control-select">
+            <option value="">All</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="area-select">Cuisine (Area)</label>
+          <select id="area-select" class="control-select">
+            <option value="">All</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="sort-select">Sort by</label>
+          <select id="sort-select" class="control-select">
+            <option value="">Default</option>
+            <option value="name-asc">Name A–Z</option>
+            <option value="name-desc">Name Z–A</option>
+            <option value="area-asc">Area A–Z</option>
+            <option value="area-desc">Area Z–A</option>
+          </select>
+        </div>
+      </section>
+
+      <section id="status" class="status hidden">
+        <span id="status-text"></span>
+      </section>
+
+      <section id="gallery" class="gallery"></section>
+    </main>
+
+    <script type="module" src="src/app.js"></script>
+  </body>
+</html>

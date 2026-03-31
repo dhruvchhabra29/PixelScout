@@ -173,14 +173,14 @@ This structure separates API logic, UI rendering, styles, and assets to keep the
    - Use sort options to order recipes by name or area.
    - Click “View Recipe” on a card to open the full recipe on TheMealDB site.
 
-More detailed setup and usage instructions will be added after Milestone 2 and Milestone 3 are completed.
+More detailed setup and usage instructions will be added after Milestone 3 are completed.
 
 ---
 
 ## 📌 Project Status
 
 - Milestone 1: **Planning & setup**
-- Milestone 2: **Pending** – API integration and basic recipe gallery
+- Milestone 2: **API integration and basic recipe gallery**
 - Milestone 3: **Pending** – search, filter, sort, and interactive features
 - Milestone 4: **Pending** – refactoring, documentation, and deployment
 

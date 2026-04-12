@@ -1,5 +1,4 @@
-
-import { searchMealsByName, listCategories, listAreas } from "./api.js";
+import { searchMealsByName, listCategories, listAreas, getMealById } from "./api.js";
 
 const searchForm = document.getElementById("search-form");
 const searchInput = document.getElementById("search-input");
@@ -11,13 +10,12 @@ const statusEl = document.getElementById("status");
 const statusTextEl = document.getElementById("status-text");
 const galleryEl = document.getElementById("gallery");
 
-let allMeals = []; 
-let filteredMeals = []; 
+let allMeals = [];
+let filteredMeals = [];
 
 function showStatus(message, type = "info") {
   statusEl.classList.remove("hidden");
   statusTextEl.textContent = message;
-
   statusEl.style.borderColor = type === "error" ? "#b91c1c" : "#1e293b";
   statusEl.style.color = type === "error" ? "#fecaca" : "#e5e7eb";
 }
@@ -28,12 +26,8 @@ function hideStatus() {
 }
 
 function setLoading(isLoading) {
-  if (isLoading) {
-    showStatus("Loading recipes...", "info");
-    searchForm.querySelector("button[type='submit']").disabled = true;
-  } else {
-    searchForm.querySelector("button[type='submit']").disabled = false;
-  }
+  searchForm.querySelector("button[type='submit']").disabled = isLoading;
+  if (isLoading) showStatus("Loading recipes...", "info");
 }
 
 function applyFilters(meals) {
@@ -41,14 +35,8 @@ function applyFilters(meals) {
   const area = areaSelect.value;
 
   return meals
-    .filter((meal) => {
-      if (!category) return true;
-      return meal.strCategory === category;
-    })
-    .filter((meal) => {
-      if (!area) return true;
-      return meal.strArea === area;
-    });
+    .filter((meal) => (!category ? true : meal.strCategory === category))
+    .filter((meal) => (!area ? true : meal.strArea === area));
 }
 
 function applySorting(meals) {
@@ -57,18 +45,10 @@ function applySorting(meals) {
 
   const copy = [...meals];
 
-  if (sortValue === "name-asc") {
-    return copy.sort((a, b) => a.strMeal.localeCompare(b.strMeal));
-  }
-  if (sortValue === "name-desc") {
-    return copy.sort((a, b) => b.strMeal.localeCompare(a.strMeal));
-  }
-  if (sortValue === "area-asc") {
-    return copy.sort((a, b) => a.strArea.localeCompare(b.strArea));
-  }
-  if (sortValue === "area-desc") {
-    return copy.sort((a, b) => b.strArea.localeCompare(a.strArea));
-  }
+  if (sortValue === "name-asc") return copy.sort((a, b) => a.strMeal.localeCompare(b.strMeal));
+  if (sortValue === "name-desc") return copy.sort((a, b) => b.strMeal.localeCompare(a.strMeal));
+  if (sortValue === "area-asc") return copy.sort((a, b) => (a.strArea || "").localeCompare(b.strArea || ""));
+  if (sortValue === "area-desc") return copy.sort((a, b) => (b.strArea || "").localeCompare(a.strArea || ""));
 
   return meals;
 }
@@ -94,7 +74,7 @@ function renderMeals(meals) {
     img.className = "card-img";
     img.src = meal.strMealThumb;
     img.alt = meal.strMeal;
-
+    img.loading = "lazy";
     imgWrapper.appendChild(img);
 
     const body = document.createElement("div");
@@ -106,7 +86,7 @@ function renderMeals(meals) {
 
     const meta = document.createElement("p");
     meta.className = "card-meta";
-    meta.textContent = `${meal.strCategory} • ${meal.strArea}`;
+    meta.textContent = `${meal.strCategory || "—"} • ${meal.strArea || "—"}`;
 
     const actions = document.createElement("div");
     actions.className = "card-actions";
@@ -119,14 +99,11 @@ function renderMeals(meals) {
     });
 
     actions.appendChild(viewBtn);
-
     body.appendChild(title);
     body.appendChild(meta);
     body.appendChild(actions);
-
     card.appendChild(imgWrapper);
     card.appendChild(body);
-
     galleryEl.appendChild(card);
   });
 }
@@ -166,10 +143,56 @@ async function initFilters() {
   }
 }
 
+async function loadAllMeals() {
+  setLoading(true);
+  try {
+    const categories = await listCategories();
+
+    const results = await Promise.all(
+      categories.map((c) =>
+        fetch(
+          `https://www.themealdb.com/api/json/v1/1/filter.php?c=${encodeURIComponent(c.strCategory)}`
+        )
+          .then((r) => r.json())
+          .then((d) =>
+            (d.meals || []).map((meal) => ({ ...meal, strCategory: c.strCategory }))
+          )
+          .catch(() => [])
+      )
+    );
+
+    const seen = new Set();
+    const stubs = results.flat().filter((meal) => {
+      if (!meal || seen.has(meal.idMeal)) return false;
+      seen.add(meal.idMeal);
+      return true;
+    });
+
+    const BATCH = 20;
+    const enriched = [];
+
+    for (let i = 0; i < stubs.length; i += BATCH) {
+      const batch = stubs.slice(i, i + BATCH);
+      const full = await Promise.all(
+        batch.map((m) => getMealById(m.idMeal).catch(() => m))
+      );
+      enriched.push(...full.filter(Boolean));
+      showStatus(`Loading recipes... ${enriched.length} / ${stubs.length}`, "info");
+    }
+
+    allMeals = enriched;
+    refreshView();
+  } catch (err) {
+    console.error(err);
+    showStatus("Failed to load recipes. Please try again.", "error");
+  } finally {
+    setLoading(false);
+  }
+}
 
 async function performSearch(query) {
   if (!query.trim()) {
-    showStatus("Please enter a recipe name.", "error");
+    await loadAllMeals();
     return;
   }
 
@@ -188,22 +211,14 @@ async function performSearch(query) {
 
 searchForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  const query = searchInput.value.trim();
-  performSearch(query);
+  performSearch(searchInput.value.trim());
 });
 
-categorySelect.addEventListener("change", () => {
-  refreshView();
-});
+categorySelect.addEventListener("change", refreshView);
+areaSelect.addEventListener("change", refreshView);
+sortSelect.addEventListener("change", refreshView);
 
-areaSelect.addEventListener("change", () => {
-  refreshView();
-});
-
-sortSelect.addEventListener("change", () => {
-  refreshView();
-});
-
+// Init
+searchInput.value = "";
 initFilters();
-searchInput.value = "chicken";
-performSearch("chicken");
+loadAllMeals();

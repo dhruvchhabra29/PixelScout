@@ -195,3 +195,5 @@ Recipe data and images are provided by **TheMealDB** and are subject to their ow
 
 Site is live on:
 https://pixelscout.netlify.app
+
+- alternative link: https://dhruvchhabra29.github.io/PixelScout/

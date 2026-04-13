@@ -181,12 +181,17 @@ More detailed setup and usage instructions will be added after Milestone 3 are c
 
 - Milestone 1: **Planning & setup**
 - Milestone 2: **API integration and basic recipe gallery**
-- Milestone 3: **Pending** – search, filter, sort, and interactive features
-- Milestone 4: **Pending** – refactoring, documentation, and deployment
+- Milestone 3: **Search, filter, sort, and interactive features**
+- Milestone 4: **Refactoring, documentation, and deployment**
 
 ---
 
 ## 📄 License
 
 This project is for educational purposes.  
-Recipe data and images are provided by **TheMealDB** and are subject to their own terms of use. [web:51][web:59][web:63]
+Recipe data and images are provided by **TheMealDB** and are subject to their own terms of use. 
+
+## Website 
+
+Site is live on:
+https://pixelscout.netlify.app
